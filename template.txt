@@ -1,0 +1,58 @@
+// {{.Name}} start
+
+type {{.Name}} []{{.PrimitiveKeyword}}
+
+type impl{{.Name}}Builder struct {
+    valueSet map[{{.PrimitiveKeyword}}]bool
+}
+
+type {{.Name}}Builder interface {
+    Add( values ...{{.PrimitiveKeyword}} ) {{.Name}}Builder
+    Sort() (out []{{.PrimitiveKeyword}})
+}
+
+func New{{.Name}}( values ...{{.PrimitiveKeyword}} ) {{.Name}}Builder {
+    b := &impl{{.Name}}Builder {
+        valueSet: make(map[{{.PrimitiveKeyword}}]bool),
+    }
+    b.Add(values...)
+    return b
+}
+
+func (b *impl{{.Name}}Builder) Add( values ...{{.PrimitiveKeyword}} ) {{.Name}}Builder {
+    for _, value := range values {
+        b.valueSet[value] = true
+    }
+    return b
+}
+
+func (b *impl{{.Name}}Builder) Sort() (out []{{.PrimitiveKeyword}}) {
+    if b.valueSet == nil {
+        return []{{.PrimitiveKeyword}}{}
+    }
+    out = make([]{{.PrimitiveKeyword}}, len(b.valueSet))
+    valueIndex := 0
+    for value := range b.valueSet {
+        out[valueIndex] = value
+        valueIndex++
+    }
+    sortable := slice{{.Name}}(out)
+    sort.Sort(&sortable)
+    return
+}
+
+type slice{{.Name}} []{{.PrimitiveKeyword}}
+
+func (v slice{{.Name}})Len() int {
+    return len(v)
+}
+
+func (v slice{{.Name}})Less(i, j int) bool {
+    return v[i] < v[j]
+}
+
+func (v *slice{{.Name}})Swap(i, j int) {
+    (*v)[i], (*v)[j] = (*v)[j], (*v)[i]
+}
+
+// {{.Name}} end
